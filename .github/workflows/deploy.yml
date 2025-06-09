@@ -1,0 +1,42 @@
+name: Deploy React App
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Setup SSH
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan -p 22 ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+
+    - name: SSH into server, deploy configs
+      run: |
+        ssh -i ~/.ssh/id_rsa -p 22 ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+          set -e
+
+          cd /root/web_application_development_technologies_kubsu
+          git pull origin main
+
+          echo "Stopping and removing old container..."
+          docker stop web-app-kubsu || true
+          docker rm web-app-kubsu || true
+
+          echo "Rebuilding image..."
+          docker build -t web-app-kubsu .
+
+          echo "Running container with name..."
+          docker run -d --name web-app-kubsu -p 3008:80 web-app-kubsu
+
+          echo "✅ Деплой завершён успешно"
+        EOF
