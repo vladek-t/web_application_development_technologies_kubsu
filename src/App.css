@@ -1,0 +1,245 @@
+:root {
+  --primary: #6c5ce7;
+  --secondary: #a29bfe;
+  --accent: #fd79a8;
+  --text: #2d3436;
+  --bg: #c2c2c2;
+  --card-bg: #ffffff;
+  --success: #00b894;
+  --danger: #d63031;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  padding: 20px;
+}
+
+.app {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.dashboard {
+  display: flex;
+  gap: 20px;
+}
+
+/* Боковая панель с валютой и погодой */
+.info-sidebar {
+  flex: 0 0 250px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.currency-card,
+.weather-card {
+  background-color: var(--card-bg);
+  border-radius: 12px;
+  padding: 15px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+.currency-card h3,
+.weather-card h3 {
+  margin-bottom: 12px;
+  color: var(--primary);
+  font-size: 1.1rem;
+  border-bottom: 1px solid var(--secondary);
+  padding-bottom: 5px;
+}
+
+.rates {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rate {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.95rem;
+}
+
+.currency-icon {
+  font-weight: bold;
+  color: var(--primary);
+}
+
+.weather-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.weather-icon {
+  font-size: 2rem;
+  margin-top: 3px;
+}
+
+.weather-details {
+  flex: 1;
+}
+
+.temp {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: var(--primary);
+  margin-bottom: 3px;
+}
+
+.desc {
+  font-size: 0.9rem;
+  color: var(--text);
+  opacity: 0.9;
+  margin-bottom: 8px;
+  text-transform: capitalize;
+}
+
+.weather-extra {
+  display: flex;
+  gap: 12px;
+  font-size: 0.85rem;
+  color: var(--text);
+  opacity: 0.8;
+}
+
+.weather-extra div {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Основной блок задач */
+.tasks-main {
+  flex: 1;
+  background-color: var(--card-bg);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+.tasks-main h2 {
+  color: var(--primary);
+  margin-bottom: 20px;
+  font-size: 1.5rem;
+}
+
+.task-input-container {
+  display: flex;
+  margin-bottom: 20px;
+}
+
+.task-input {
+  flex: 1;
+  padding: 12px 15px;
+  border: 2px solid var(--secondary);
+  border-radius: 8px 0 0 8px;
+  font-size: 1rem;
+  outline: none;
+}
+
+.add-btn {
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 0 8px 8px 0;
+  padding: 0 20px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s;
+}
+
+.add-btn:hover {
+  background-color: var(--accent);
+}
+
+.tasks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 500px;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+.task {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 15px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.task:hover {
+  background-color: #e9ecef;
+}
+
+.task.completed .task-text {
+  text-decoration: line-through;
+  color: #6c757d;
+  opacity: 0.7;
+}
+
+.task-text {
+  flex: 1;
+  cursor: pointer;
+  padding: 5px;
+  word-break: break-word;
+}
+
+.delete-btn {
+  background-color: var(--danger);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.2s;
+}
+
+.delete-btn:hover {
+  background-color: #c0392b;
+}
+
+.empty-tasks {
+  text-align: center;
+  color: #6c757d;
+  padding: 20px;
+  font-style: italic;
+}
+
+/* Полоса прокрутки */
+.tasks-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.tasks-list::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.tasks-list::-webkit-scrollbar-thumb {
+  background: var(--secondary);
+  border-radius: 3px;
+}
+
+.tasks-list::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
+}
