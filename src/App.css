@@ -3,10 +3,10 @@
   --secondary: #a29bfe;
   --accent: #fd79a8;
   --text: #2d3436;
-  --bg: #c2c2c2;
+  --bg: #f7f1e3;
   --card-bg: #ffffff;
-  --success: #00b894;
   --danger: #d63031;
+  --error: #ff6b6b;
 }
 
 * {
@@ -32,24 +32,22 @@ body {
   gap: 20px;
 }
 
-/* Боковая панель с валютой и погодой */
+/* Боковая панель */
 .info-sidebar {
-  flex: 0 0 250px;
+  flex: 0 0 300px;
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
-.currency-card,
-.weather-card {
+.api-card {
   background-color: var(--card-bg);
   border-radius: 12px;
   padding: 15px;
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
 }
 
-.currency-card h3,
-.weather-card h3 {
+.api-card h3 {
   margin-bottom: 12px;
   color: var(--primary);
   font-size: 1.1rem;
@@ -57,66 +55,86 @@ body {
   padding-bottom: 5px;
 }
 
-.rates {
+/* Стили для покемонов */
+.pokemon-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.pokemon-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+}
+
+.pokemon-image {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+  background-color: #f0f0f0;
+  border-radius: 50%;
+}
+
+.pokemon-info h4 {
+  font-size: 0.95rem;
+  color: var(--primary);
+  margin: 0;
+  text-transform: capitalize;
+}
+
+.pokemon-info p {
+  font-size: 0.85rem;
+  color: var(--text);
+  opacity: 0.8;
+  margin: 0;
+}
+
+/* Стили для собак */
+.dogs-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.dog-image {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 8px;
+  background-color: #f0f0f0;
+}
+
+/* Обработка ошибок */
+.error {
+  color: var(--error);
+  padding: 10px;
+  text-align: center;
+  background-color: #ffebee;
+  border-radius: 5px;
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.rate {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.95rem;
+.retry-btn {
+  background-color: var(--error);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 5px 10px;
+  cursor: pointer;
+  font-size: 0.8rem;
 }
 
-.currency-icon {
-  font-weight: bold;
-  color: var(--primary);
-}
-
-.weather-info {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-}
-
-.weather-icon {
-  font-size: 2rem;
-  margin-top: 3px;
-}
-
-.weather-details {
-  flex: 1;
-}
-
-.temp {
-  font-size: 1.3rem;
-  font-weight: bold;
-  color: var(--primary);
-  margin-bottom: 3px;
-}
-
-.desc {
-  font-size: 0.9rem;
+.loading {
+  text-align: center;
   color: var(--text);
-  opacity: 0.9;
-  margin-bottom: 8px;
-  text-transform: capitalize;
-}
-
-.weather-extra {
-  display: flex;
-  gap: 12px;
-  font-size: 0.85rem;
-  color: var(--text);
-  opacity: 0.8;
-}
-
-.weather-extra div {
-  display: flex;
-  align-items: center;
-  gap: 4px;
+  opacity: 0.7;
+  padding: 10px;
 }
 
 /* Основной блок задач */
@@ -225,21 +243,13 @@ body {
   font-style: italic;
 }
 
-/* Полоса прокрутки */
-.tasks-list::-webkit-scrollbar {
-  width: 6px;
-}
-
-.tasks-list::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 3px;
-}
-
-.tasks-list::-webkit-scrollbar-thumb {
-  background: var(--secondary);
-  border-radius: 3px;
-}
-
-.tasks-list::-webkit-scrollbar-thumb:hover {
-  background: var(--primary);
+/* Адаптивность */
+@media (max-width: 768px) {
+  .dashboard {
+    flex-direction: column;
+  }
+  
+  .info-sidebar {
+    flex: 0 0 auto;
+  }
 }

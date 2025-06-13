@@ -3,45 +3,74 @@ import axios from 'axios';
 import './App.css';
 
 export default function App() {
+  // Состояние для задач
   const [tasks, setTasks] = useState(() => {
-    const savedTasks = localStorage.getItem('tasks');
-    return savedTasks ? JSON.parse(savedTasks) : [];
+    const saved = localStorage.getItem('tasks');
+    return saved ? JSON.parse(saved) : [];
   });
-  
   const [newTask, setNewTask] = useState('');
-  const [rates, setRates] = useState({ usd: '...', eur: '...' });
-  const [weather, setWeather] = useState(null);
 
-  // Функция для направления ветра
-  const getWindDirection = (degrees) => {
-    const directions = ['С', 'СВ', 'В', 'ЮВ', 'Ю', 'ЮЗ', 'З', 'СЗ'];
-    const index = Math.round(degrees / 45) % 8;
-    return directions[index];
+  // Состояние для API
+  const [pokemons, setPokemons] = useState([]);
+  const [dogs, setDogs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [apiError, setApiError] = useState(null);
+
+  // Функция для получения случайного числа
+  const getRandomOffset = () => Math.floor(Math.random() * 800); // Всего ~1000 покемонов
+
+  // Загрузка данных
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      setApiError(null);
+
+      // Загрузка случайных покемонов
+      const pokemonResponse = await axios.get(
+        `https://pokeapi.co/api/v2/pokemon?limit=2&offset=${getRandomOffset()}`
+      );
+      const pokemonDetails = await Promise.all(
+        pokemonResponse.data.results.map(async (pokemon) => {
+          try {
+            const res = await axios.get(pokemon.url);
+            return {
+              name: res.data.name,
+              image: res.data.sprites.other['official-artwork'].front_default || '/placeholder.png',
+              type: res.data.types[0]?.type.name || 'unknown'
+            };
+          } catch {
+            return {
+              name: pokemon.name,
+              image: '/placeholder.png',
+              type: 'unknown'
+            };
+          }
+        })
+      );
+      setPokemons(pokemonDetails);
+
+      // Загрузка собак
+      const dogsResponse = await axios.get('https://dog.ceo/api/breeds/image/random/2');
+      setDogs(dogsResponse.data.message);
+
+    } catch (error) {
+      setApiError('Ошибка загрузки данных. Проверьте подключение к интернету.');
+      console.error('API Error:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // Загрузка данных при монтировании
   useEffect(() => {
-    // Курс валют
-    axios.get('https://www.cbr-xml-daily.ru/daily_json.js')
-      .then(res => {
-        setRates({
-          usd: res.data.Valute.USD.Value.toFixed(2),
-          eur: res.data.Valute.EUR.Value.toFixed(2)
-        });
-      });
-
-    // Погода
-    navigator.geolocation.getCurrentPosition(pos => {
-      axios.get(`https://api.openweathermap.org/data/2.5/weather?lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&appid=c7616da4b68205c2f3ae73df2c31d177&units=metric&lang=ru`)
-        .then(res => setWeather(res.data));
-    });
+    fetchData();
   }, []);
 
-  // Сохранение задач при изменении
+  // Сохранение задач
   useEffect(() => {
     localStorage.setItem('tasks', JSON.stringify(tasks));
   }, [tasks]);
 
+  // Добавление задачи
   const addTask = () => {
     if (newTask.trim()) {
       setTasks([...tasks, {
@@ -53,18 +82,21 @@ export default function App() {
     }
   };
 
+  // Обработка нажатия Enter
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') {
       addTask();
     }
   };
 
+  // Переключение статуса задачи
   const toggleTask = (id) => {
     setTasks(tasks.map(task => 
       task.id === id ? { ...task, completed: !task.completed } : task
     ));
   };
 
+  // Удаление задачи
   const deleteTask = (id) => {
     setTasks(tasks.filter(task => task.id !== id));
   };
@@ -72,49 +104,60 @@ export default function App() {
   return (
     <div className="app">
       <div className="dashboard">
-        {/* Боковая панель */}
+        {/* Боковая панель с API */}
         <div className="info-sidebar">
-          <div className="currency-card">
-            <h3>Курс валют</h3>
-            <div className="rates">
-              <div className="rate">
-                <span className="currency-icon">$</span>
-                <span>{rates.usd} ₽</span>
+          <div className="api-card">
+            <h3>Случайные покемоны</h3>
+            {apiError ? (
+              <div className="error">
+                {apiError}
+                <button onClick={fetchData} className="retry-btn">Повторить</button>
               </div>
-              <div className="rate">
-                <span className="currency-icon">€</span>
-                <span>{rates.eur} ₽</span>
-              </div>
-            </div>
-          </div>
-
-          {weather && (
-            <div className="weather-card">
-              <h3>Погода</h3>
-              <div className="weather-info">
-                <span className="weather-icon">
-                  {weather.weather[0].main === 'Clear' ? '☀️' : 
-                   weather.weather[0].main === 'Rain' ? '🌧️' : 
-                   weather.weather[0].main === 'Clouds' ? '☁️' : '🌈'}
-                </span>
-                <div className="weather-details">
-                  <div className="temp">{Math.round(weather.main.temp)}°C</div>
-                  <div className="desc">{weather.weather[0].description}</div>
-                  <div className="weather-extra">
-                    <div className="wind">
-                      <span role="img" aria-label="wind">🌬️</span> 
-                      {weather.wind.speed} м/с
-                      {weather.wind.deg && `, ${getWindDirection(weather.wind.deg)}`}
-                    </div>
-                    <div className="clouds">
-                      <span role="img" aria-label="clouds">☁️</span> 
-                      {weather.clouds.all}%
+            ) : loading ? (
+              <div className="loading">Загрузка...</div>
+            ) : (
+              <div className="pokemon-list">
+                {pokemons.map((pokemon, index) => (
+                  <div key={index} className="pokemon-item">
+                    <img 
+                      src={pokemon.image} 
+                      alt={pokemon.name}
+                      className="pokemon-image"
+                      onError={(e) => e.target.src = '/placeholder.png'}
+                    />
+                    <div className="pokemon-info">
+                      <h4>{pokemon.name}</h4>
+                      <p>Тип: {pokemon.type}</p>
                     </div>
                   </div>
-                </div>
+                ))}
               </div>
-            </div>
-          )}
+            )}
+          </div>
+
+          <div className="api-card">
+            <h3>Случайные собаки</h3>
+            {apiError ? (
+              <div className="error">
+                {apiError}
+                <button onClick={fetchData} className="retry-btn">Повторить</button>
+              </div>
+            ) : loading ? (
+              <div className="loading">Загрузка...</div>
+            ) : (
+              <div className="dogs-list">
+                {dogs.map((dog, index) => (
+                  <img
+                    key={index}
+                    src={dog}
+                    alt="Случайная собака"
+                    className="dog-image"
+                    onError={(e) => e.target.src = '/placeholder.png'}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Основной блок задач */}
