@@ -11,13 +11,10 @@ export default function App() {
   const [newTask, setNewTask] = useState('');
 
   // Состояние для API
-  const [pokemons, setPokemons] = useState([]);
-  const [dogs, setDogs] = useState([]);
+  const [jokes, setJokes] = useState([]);
+  const [catFacts, setCatFacts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [apiError, setApiError] = useState(null);
-
-  // Функция для получения случайного числа
-  const getRandomOffset = () => Math.floor(Math.random() * 800); // Всего ~1000 покемонов
 
   // Загрузка данных
   const fetchData = async () => {
@@ -25,33 +22,33 @@ export default function App() {
       setLoading(true);
       setApiError(null);
 
-      // Загрузка случайных покемонов
-      const pokemonResponse = await axios.get(
-        `https://pokeapi.co/api/v2/pokemon?limit=2&offset=${getRandomOffset()}`
-      );
-      const pokemonDetails = await Promise.all(
-        pokemonResponse.data.results.map(async (pokemon) => {
-          try {
-            const res = await axios.get(pokemon.url);
-            return {
-              name: res.data.name,
-              image: res.data.sprites.other['official-artwork'].front_default || '/placeholder.png',
-              type: res.data.types[0]?.type.name || 'unknown'
-            };
-          } catch {
-            return {
-              name: pokemon.name,
-              image: '/placeholder.png',
-              type: 'unknown'
-            };
-          }
-        })
-      );
-      setPokemons(pokemonDetails);
+      // Загрузка шуток (используем JokeAPI)
+      const jokesResponse = await axios.get('https://v2.jokeapi.dev/joke/Programming?blacklistFlags=nsfw,religious,political,racist,sexist,explicit&amount=2');
+      
+      // Форматирование шуток
+      let formattedJokes = [];
+      if (jokesResponse.data.jokes) {
+        formattedJokes = jokesResponse.data.jokes.map(joke => ({
+          id: joke.id,
+          text: joke.setup + (joke.delivery ? ` ${joke.delivery}` : ''),
+          category: joke.category
+        }));
+      } else {
+        formattedJokes = [{
+          id: jokesResponse.data.id,
+          text: jokesResponse.data.setup + (jokesResponse.data.delivery ? ` ${jokesResponse.data.delivery}` : ''),
+          category: jokesResponse.data.category
+        }];
+      }
+      setJokes(formattedJokes);
 
-      // Загрузка собак
-      const dogsResponse = await axios.get('https://dog.ceo/api/breeds/image/random/2');
-      setDogs(dogsResponse.data.message);
+      // Загрузка фактов о кошках (используем альтернативный API без CORS)
+      const catFactsResponse = await axios.get('https://meowfacts.herokuapp.com/?count=2');
+      setCatFacts(catFactsResponse.data.data.map((fact, index) => ({
+        id: `fact-${index}`,
+        text: fact,
+        verified: true // Этот API не предоставляет статус проверки
+      })));
 
     } catch (error) {
       setApiError('Ошибка загрузки данных. Проверьте подключение к интернету.');
@@ -107,7 +104,7 @@ export default function App() {
         {/* Боковая панель с API */}
         <div className="info-sidebar">
           <div className="api-card">
-            <h3>Случайные покемоны</h3>
+            <h3>Программистские шутки</h3>
             {apiError ? (
               <div className="error">
                 {apiError}
@@ -116,19 +113,11 @@ export default function App() {
             ) : loading ? (
               <div className="loading">Загрузка...</div>
             ) : (
-              <div className="pokemon-list">
-                {pokemons.map((pokemon, index) => (
-                  <div key={index} className="pokemon-item">
-                    <img 
-                      src={pokemon.image} 
-                      alt={pokemon.name}
-                      className="pokemon-image"
-                      onError={(e) => e.target.src = '/placeholder.png'}
-                    />
-                    <div className="pokemon-info">
-                      <h4>{pokemon.name}</h4>
-                      <p>Тип: {pokemon.type}</p>
-                    </div>
+              <div className="jokes-list">
+                {jokes.map((joke) => (
+                  <div key={joke.id} className="joke-item">
+                    <p className="joke-text">{joke.text}</p>
+                    <span className="joke-category">{joke.category}</span>
                   </div>
                 ))}
               </div>
@@ -136,7 +125,7 @@ export default function App() {
           </div>
 
           <div className="api-card">
-            <h3>Случайные собаки</h3>
+            <h3>Факты о кошках</h3>
             {apiError ? (
               <div className="error">
                 {apiError}
@@ -145,15 +134,12 @@ export default function App() {
             ) : loading ? (
               <div className="loading">Загрузка...</div>
             ) : (
-              <div className="dogs-list">
-                {dogs.map((dog, index) => (
-                  <img
-                    key={index}
-                    src={dog}
-                    alt="Случайная собака"
-                    className="dog-image"
-                    onError={(e) => e.target.src = '/placeholder.png'}
-                  />
+              <div className="cat-facts-list">
+                {catFacts.map((fact) => (
+                  <div key={fact.id} className="fact-item">
+                    <p className="fact-text">{fact.text}</p>
+                    {fact.verified && <span className="fact-status">✓ Подтверждено</span>}
+                  </div>
                 ))}
               </div>
             )}

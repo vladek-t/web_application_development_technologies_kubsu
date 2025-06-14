@@ -55,57 +55,62 @@ body {
   padding-bottom: 5px;
 }
 
-/* Стили для покемонов */
-.pokemon-list {
+/* Стили для шуток */
+.jokes-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 15px;
 }
 
-.pokemon-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px;
+.joke-item {
   background-color: #f8f9fa;
+  padding: 12px;
   border-radius: 8px;
+  border-left: 4px solid var(--primary);
 }
 
-.pokemon-image {
-  width: 60px;
-  height: 60px;
-  object-fit: contain;
-  background-color: #f0f0f0;
-  border-radius: 50%;
+.joke-text {
+  margin-bottom: 5px;
+  line-height: 1.4;
 }
 
-.pokemon-info h4 {
-  font-size: 0.95rem;
-  color: var(--primary);
-  margin: 0;
-  text-transform: capitalize;
+.joke-category {
+  font-size: 0.75rem;
+  color: var(--secondary);
+  background-color: #e9ecef;
+  padding: 2px 6px;
+  border-radius: 10px;
+  display: inline-block;
 }
 
-.pokemon-info p {
-  font-size: 0.85rem;
+/* Стили для фактов о кошках */
+.cat-facts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.fact-item {
+  background-color: #f8f9fa;
+  padding: 12px;
+  border-radius: 8px;
+  border-left: 4px solid var(--accent);
+}
+
+.fact-text {
+  margin-bottom: 5px;
+  line-height: 1.4;
+}
+
+.fact-status {
+  font-size: 0.75rem;
   color: var(--text);
-  opacity: 0.8;
-  margin: 0;
+  opacity: 0.7;
 }
 
-/* Стили для собак */
-.dogs-list {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-}
-
-.dog-image {
-  width: 100%;
-  height: 120px;
-  object-fit: cover;
-  border-radius: 8px;
-  background-color: #f0f0f0;
+.fact-status:before {
+  content: "• ";
+  color: var(--accent);
 }
 
 /* Обработка ошибок */
